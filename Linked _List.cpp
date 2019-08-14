@@ -23,28 +23,28 @@ void AddFirst(int a,int b,struct coordinate** head){
 
 }
 
-int DelFirst(struct coordinate** head){
+void DelFirst(struct coordinate** head){
     if(*head!=NULL){
         coordinate* temp = *head;
         *head = temp->next;
         free(temp);
         temp->next=NULL;
-        return 0;
     }
-    else return -1;
+    else cout<<-1<<endl;
 }
 
-int Del(int a,int b,struct coordinate** head){
+void Del(int a,int b,struct coordinate** head){
     coordinate* temp = *head;
     coordinate* temp2 = NULL;
     while(temp!=NULL){
         if(temp->x==a&&temp->y==b&&temp2!=NULL){
             temp2->next = temp->next;
             free(temp);
-            return 0;
+						break;
         }
         else if(temp2 == NULL&&temp->x==a&&temp->y==b){
-            return DelFirst(head);
+            DelFirst(head);
+						break;
         }
         else{
             temp2 = temp;
@@ -52,21 +52,23 @@ int Del(int a,int b,struct coordinate** head){
 
         }
     }
-    return -1;
+    if(temp==NULL)cout<<-1<<endl;
 }
 void search(float d, struct coordinate** head){
     coordinate* temp = *head;
+		int count=0;
     while(temp!= NULL){
         float len = (float)sqrt((temp->x)*(temp->x)+(temp->y)*(temp->y));
         if(len<=d){
-            cout<<"("<<temp->x<<","<<temp->y<<") ";
+            count++;
             temp = temp->next;
         }
         else{
             temp = temp->next;
         }
     }
-    cout<<endl;
+    if(count>0)cout<<count<<endl;
+		else cout<<-1<<endl;
 }
 void search(int a ,int b ,struct coordinate** head){
     coordinate* temp = *head;
@@ -110,12 +112,12 @@ int main(){
             AddFirst(a,b,&head);
         }
         else if(t ==2){
-            cout<<DelFirst(&head)<<endl;
+            DelFirst(&head);
         }
         else if(t == 3){
             int a,b;
             cin>>a>>b;
-            cout<<Del(a,b,&head)<<endl;
+            Del(a,b,&head);
         }
         else if(t==4){
             float a;
