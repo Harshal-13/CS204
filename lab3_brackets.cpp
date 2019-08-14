@@ -10,6 +10,8 @@ bool isBalanced(string expr)
 
 	for(int i = 0; i < expr.length(); i++)
 	{
+    if(expr[i] =='(' || expr[i] =='[' || expr[i] =='<' || expr[i] =='{' || expr[i] =='|' || expr[i] ==')' || expr[i] =='}' || expr[i] ==']' || expr[i] =='>' )
+    {
 		if(expr[i] == '(' || expr[i] == '{' || expr[i] == '[' || expr[i] == '<' || expr[i] == '|')
 		{
       if(s.size()==0){
@@ -56,8 +58,12 @@ bool isBalanced(string expr)
 				break;
 
 		}
+
 	}
-	return (s.empty());
+
+else return false;
+}
+return (s.empty());
 }
 
 int main()
@@ -75,3 +81,4 @@ int main()
 	}
 	return 0;
 }
+
