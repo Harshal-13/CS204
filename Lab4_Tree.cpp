@@ -28,7 +28,7 @@ struct node
 struct node *createNode(){
 
     struct node *temp=(struct node *)malloc(sizeof(struct node));
-    temp->c='n';
+    temp->c='o';
     temp->n=-12345;
 
     return temp;
@@ -135,7 +135,7 @@ void build(string s,struct node *start)
 
 long long int evaluate(struct node *start)
 {
-  if(start->c != 'n'){
+  if(start->c != 'o'){
       if(start->c == '^')
       {
           return powerrr(evaluate(start->left), evaluate(start->right));
