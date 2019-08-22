@@ -1,203 +1,246 @@
 #include <bits/stdc++.h>
-#include <math.h>
-
+#define lli long long int
+#define f(a, b, c) for (lli a = b; a < c; a++)
 using namespace std;
-
-long long int powerrr(long long int a, long long int b)
+vector<string> Str_to_Vec(string s)
 {
-    long long int ans = 1;
-    for(long long int i = 0; i < b; i++)
+    vector<string> str;
+    int len = s.length();
+    for(int i = 0; i<len;i++)
     {
-        ans*= a;
+        string t="";
+        if((s[i] >= '0' && s[i] <= '9')) 
+        {
+            int k = i;
+            for(;(s[k] >= '0' && s[k] <= '9');k++)
+            {
+                t+=s[k];
+            }
+            i = k-1;
+        }
+        else 
+        {
+            t+=s[i];
+        }
+        str.push_back(t);
     }
-    return ans;
+    return str;
 }
 
-stack<char>brac;
-long long int flag;
-set<char> charc;
+bool Is_Operator(char o)
+{
+  if(o=='+'||o=='-'||o=='^'||o=='*'||o=='/')
+  {
+    return true;
+  }
+  return false;
+}
+
+int Precede(string s) 
+{ 
+    if(s=="$")
+      return 4;
+    else if(s == "^") 
+    return 3; 
+    else if(s == "*" || s == "/") 
+    return 2; 
+    else if(s == "+" || s == "-") 
+    return 1; 
+    else
+    return -1; 
+} 
+
+vector<string> In_to_Post(vector<string> str) 
+{ 
+    stack<string> stk; 
+    stk.push("N"); 
+    int len = str.size(); 
+    vector<string> new;
+    for(int i = 0; i < len; i++) 
+    { 
+        if((str[i][0] >= '0' && str[i][0] <= '9')) 
+            new.push_back(str[i]);
+        else if(str[i] == "(") 
+            stk.push("("); 
+        else if(str[i] == ")") 
+        { 
+            while(stk.top() != "N" && stk.top() != "(") 
+            { 
+                string c = stk.top(); 
+                stk.pop(); 
+                new.push_back(c);
+            } 
+            if(stk.top() == "(") 
+            { 
+                string c = stk.top(); 
+                stk.pop(); 
+            } 
+        } 
+        else{
+            while(stk.top() != "N" && Precede(str[i]) <= Precede(str.top())) 
+            { 
+                if(str[i]=="^"&&stk.top()=="^") break;
+                string c = stk.top(); 
+                stk.pop(); 
+                new.push_back(c); 
+            } 
+            stk.push(str[i]); 
+        } 
+  
+    } 
+    while(stk.top() != "N") 
+    { 
+        string c = stk.top(); 
+        stk.pop(); 
+        new.push_back(c); 
+    } 
+    return new;
+} 
 
 struct node
 {
-  char c;
-  long long int n;
-  struct node *left;
-  struct node *right;
+  string s;
+  node* left=NULL,*right=NULL;
 };
 
-struct node *createNode(){
+node* ct(vector <string> PFIX)
+{
+       node *root=NULL;
+       vector <node*> stack1;
+       int i=0;
+       while(i!=PFIX.size())
+       {
+         if(PFIX[i]!="+" && PFIX[i]!="-" && PFIX[i]!="*" && PFIX[i]!="/" && PFIX[i]!="^" && PFIX[i]!="$")
+           {
 
-    struct node *temp=(struct node *)malloc(sizeof(struct node));
-    temp->c='o';
-    temp->n=-12345;
+                 node *temp=(node *)malloc(sizeof(node));
 
-    return temp;
+                 temp->s=PFIX[i];
 
+                 stack1.push_back(temp);
+           } 
+         else if(PFIX[i]!="$")
+         { 
+               if(stack1.size()<2)return NULL;
+
+               node *s1=stack1.back();
+
+               stack1.pop_back();
+
+               node *s2=stack1.back();
+
+               stack1.pop_back();
+
+               node *temp=(node *)malloc(sizeof(node));
+
+               temp->s=PFIX[i];
+
+               temp->left=s2;
+
+               temp->right=s1;
+
+               stack1.push_back(temp); 
+         }
+         else
+         {
+                if(stack1.size()<1)return NULL;
+                node *s1=stack1.back();
+                stack1.pop_back();
+                node *temp=(node *)malloc(sizeof(node));
+                temp->left=s1;
+                temp->s="$";
+                stack1.push_back(temp);
+         }
+         i++;
+       }
+    if(stack1.size()!=1)
+          return NULL;
+    return stack1.back();
 }
 
-void build(string s,struct node *start)
+lli evaluate(node *root)
 {
-  for(long long int i=s.length()-1; i>=0; i--)
+   string s=root->s;
+   lli answer=0;
+   if(s!="+" && s!="-" && s!="*" && s!="/" && s!="^" && s!="$")
+   return stoi(s);
+   else
+   {
+     int lanswer=evaluate(root->left),ranswer=0;
+     if(s!="$")
+      ranswer = evaluate(root->right);
+
+     if(s=="+")
+       answer=lanswer+ranswer;
+     else if(s=="-")
+       answer=lanswer-ranswer;
+     else if(s=="*")
+       answer=lanswer*ranswer;
+     else if(s=="/")
+       {
+          if(ranswer==0)
+          {
+            answer = std::numeric_limits<lli>::max();
+          }       
+          else answer=lanswer/ranswer;
+        } 
+     else if(s=="^")
+     {
+       answer=1;
+       if(ranswer<0) answer=0;
+       else f(i,0,ranswer)answer*=lanswer;
+     }
+     else
+     {
+       answer=-evaluate(root->left);
+     }
+   }
+   return answer;
+}
+
+int main() 
+{ 
+  int q;
+  cin>>q;
+  while(q--)
   {
-      if(charc.find(s[i])==charc.end())flag++;
-      if(s[i] == ')')brac.push(s[i]);
-      if(s[i] == '(')brac.pop();
-
-      if(!(brac.empty()))continue;
-
-      if(s[i]=='+' || s[i]=='-')
+    int n;
+    cin>>n;
+    for(lli i = 0;i<n;i++)
+    {
+      string s,s1;
+      cin>>s;
+      
+      for(int i = 0; i<s.size() ; i++)
       {
-          start->c=s[i];
-          string s1=s.substr(0,i);
-          string s2=s.substr(i+1, s.length()-1-i);
-
-          start->left=createNode();
-          start->right=createNode();
-          build(s1, start->left);
-          build(s2, start->right);
-
-          return;
-
-      }
-    }
-
-    for(long long int i=s.length()-1; i>=0; i--)
-    {
-        if(charc.find(s[i])==charc.end())flag++;
-        if(s[i] == ')')brac.push(s[i]);
-        if(s[i] == '(')brac.pop();
-
-        if(!(brac.empty()))continue;
-
-        if(s[i]=='*' || s[i]=='/'){
-            start->c=s[i];
-            string s1=s.substr(0,i);
-            string s2=s.substr(i+1, s.length()-1-i);
-
-            start->left=createNode();
-            start->right=createNode();
-            build(s1, start->left);
-            build(s2, start->right);
-
-            return;
-        }
-    }
-
-    for(int i=0;i<s.length();i++)
-    {
-        if(charc.find(s[i])==charc.end())flag++;
-        if(s[i] == '(')brac.push(s[i]);
-        if(s[i] == ')')brac.pop();
-
-        if(!(brac.empty()))continue;
-
-        if(s[i]=='^'){
-
-            start->c='^';
-            string s1=s.substr(0,i);
-            string s2=s.substr(i+1, s.length()-1-i);
-
-            start->left=createNode();
-            start->right=createNode();
-            build(s1, start->left);
-            build(s2, start->right);
-
-            return;
-        }
-    }
-
-    for(int i=0;i<s.length();i++)
-    {
-        if(charc.find(s[i])==charc.end())flag++;
-        if(s[i]=='(')
+        if(s[i]=='-')
         {
-            stack<char> st;
-            st.push('(');
-
-            for(int j=i+1;j<s.length();j++)
-            {
-                if(s[j]=='(')st.push('(');
-                if(s[j]==')')
-                {
-                    st.pop();
-                }
-                if(st.empty())
-                {
-                    string b=s.substr(i+1, j-1-i);
-                    build(b, start);
-                    return;
-                }
-            }
+          if(i==0||s[i-1]=='('||Is_Operator(s[i-1]))
+          {
+            s1.push_back('$');
+            continue;
+          }
         }
+        s1.push_back(s[i]);
+      }
+
+      vector <string> newv=Str_to_Vec(s1);
+      newv=In_to_Post(newv);
+      node* root=ct(newv);
+      
+      if(root!=NULL)
+        {
+          if(evaluate(root)==std::numeric_limits<lli>::max())
+            cout<<"CANT BE EVALUATED\n";
+          else
+              cout<<evaluate(root)<<"\n";
+        }
+      else 
+      {
+        cout<<"CANT BE EVALUATED\n";
+      }
+
     }
-    start->n=stoll(s);
-}
-
-long long int evaluate(struct node *start)
-{
-  if(start->c != 'o'){
-      if(start->c == '^')
-      {
-          return powerrr(evaluate(start->left), evaluate(start->right));
-      }
-      else if(start->c == '*')
-      {
-          return evaluate(start->left)*evaluate(start->right);
-      }
-      else if(start->c == '/')
-      {
-          return evaluate(start->left)/evaluate(start->right);
-      }
-      else if(start->c=='+')
-      {
-          return evaluate(start->left)+evaluate(start->right);
-      }
-       else
-      {
-          return evaluate(start->left)-evaluate(start->right);
-      }
   }
-  else
-  {
-      return start->n;
-  }
-}
-
-int main()
-{
-  ios::sync_with_stdio(0);
-  cin.tie(0);
-  cout.tie(0);
-
-  charc.insert('^');
-  charc.insert('+');
-  charc.insert('-');
-  charc.insert('*');
-  charc.insert('/');
-  charc.insert('0');
-  charc.insert('1');
-  charc.insert('2');
-  charc.insert('3');
-  charc.insert('4');
-  charc.insert('5');
-  charc.insert('6');
-  charc.insert('7');
-  charc.insert('8');
-  charc.insert('9');
-  charc.insert('(');
-  charc.insert(')');
-
-  long long int t;
-  cin>>t;
-  while(t--){
-    flag=0;
-    string s;
-    cin>>s;
-    struct node *start=createNode();
-
-    build(s,start);
-    long long int x=evaluate(start);
-    if(flag) cout<<"CAN'T BE EVALUATED"<<endl;
-    else cout<<x<<endl;
-  }
+  return 0; 	
 }
