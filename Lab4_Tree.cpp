@@ -26,7 +26,7 @@ vector<string> Str_to_Vec(string s)
     }
     return str;
 }
-
+ 
 bool Is_Operator(char o)
 {
   if(o=='+'||o=='-'||o=='^'||o=='*'||o=='/')
@@ -35,7 +35,7 @@ bool Is_Operator(char o)
   }
   return false;
 }
-
+ 
 int Precede(string s) 
 { 
     if(s=="$")
@@ -49,17 +49,17 @@ int Precede(string s)
     else
     return -1; 
 } 
-
+ 
 vector<string> In_to_Post(vector<string> str) 
 { 
     stack<string> stk; 
     stk.push("N"); 
     int len = str.size(); 
-    vector<string> new;
+    vector<string> n;
     for(int i = 0; i < len; i++) 
     { 
         if((str[i][0] >= '0' && str[i][0] <= '9')) 
-            new.push_back(str[i]);
+            n.push_back(str[i]);
         else if(str[i] == "(") 
             stk.push("("); 
         else if(str[i] == ")") 
@@ -68,7 +68,7 @@ vector<string> In_to_Post(vector<string> str)
             { 
                 string c = stk.top(); 
                 stk.pop(); 
-                new.push_back(c);
+                n.push_back(c);
             } 
             if(stk.top() == "(") 
             { 
@@ -77,32 +77,32 @@ vector<string> In_to_Post(vector<string> str)
             } 
         } 
         else{
-            while(stk.top() != "N" && Precede(str[i]) <= Precede(str.top())) 
+            while(stk.top() != "N" && Precede(str[i]) <= Precede(stk.top())) 
             { 
                 if(str[i]=="^"&&stk.top()=="^") break;
                 string c = stk.top(); 
                 stk.pop(); 
-                new.push_back(c); 
+                n.push_back(c); 
             } 
             stk.push(str[i]); 
         } 
-  
+ 
     } 
     while(stk.top() != "N") 
     { 
         string c = stk.top(); 
         stk.pop(); 
-        new.push_back(c); 
+        n.push_back(c); 
     } 
-    return new;
+    return n;
 } 
-
+ 
 struct node
 {
   string s;
   node* left=NULL,*right=NULL;
 };
-
+ 
 node* ct(vector <string> PFIX)
 {
        node *root=NULL;
@@ -112,33 +112,33 @@ node* ct(vector <string> PFIX)
        {
          if(PFIX[i]!="+" && PFIX[i]!="-" && PFIX[i]!="*" && PFIX[i]!="/" && PFIX[i]!="^" && PFIX[i]!="$")
            {
-
+ 
                  node *temp=(node *)malloc(sizeof(node));
-
+ 
                  temp->s=PFIX[i];
-
+ 
                  stack1.push_back(temp);
            } 
          else if(PFIX[i]!="$")
          { 
                if(stack1.size()<2)return NULL;
-
+ 
                node *s1=stack1.back();
-
+ 
                stack1.pop_back();
-
+ 
                node *s2=stack1.back();
-
+ 
                stack1.pop_back();
-
+ 
                node *temp=(node *)malloc(sizeof(node));
-
+ 
                temp->s=PFIX[i];
-
+ 
                temp->left=s2;
-
+ 
                temp->right=s1;
-
+ 
                stack1.push_back(temp); 
          }
          else
@@ -157,7 +157,7 @@ node* ct(vector <string> PFIX)
           return NULL;
     return stack1.back();
 }
-
+ 
 lli evaluate(node *root)
 {
    string s=root->s;
@@ -169,7 +169,7 @@ lli evaluate(node *root)
      int lanswer=evaluate(root->left),ranswer=0;
      if(s!="$")
       ranswer = evaluate(root->right);
-
+ 
      if(s=="+")
        answer=lanswer+ranswer;
      else if(s=="-")
@@ -197,7 +197,7 @@ lli evaluate(node *root)
    }
    return answer;
 }
-
+ 
 int main() 
 { 
   int q;
@@ -210,7 +210,7 @@ int main()
     {
       string s,s1;
       cin>>s;
-      
+ 
       for(int i = 0; i<s.size() ; i++)
       {
         if(s[i]=='-')
@@ -223,11 +223,11 @@ int main()
         }
         s1.push_back(s[i]);
       }
-
+ 
       vector <string> newv=Str_to_Vec(s1);
       newv=In_to_Post(newv);
       node* root=ct(newv);
-      
+ 
       if(root!=NULL)
         {
           if(evaluate(root)==std::numeric_limits<lli>::max())
@@ -239,7 +239,7 @@ int main()
       {
         cout<<"CANT BE EVALUATED\n";
       }
-
+ 
     }
   }
   return 0; 	
