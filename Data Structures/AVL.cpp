@@ -211,7 +211,7 @@ int main(){
     root = Insert(root, -1);
     root = Insert(root, 1);
     root = Insert(root, 2);
-    inorder(root)
+    inorder(root);
 
     /* The constructed AVL Tree would be
             9
