@@ -2,66 +2,72 @@
 using namespace std;
 #define M 10000007
 #define ll long long
-#define ld long double
-#define vi vector<int>
-#define vll vector<ll>
-#define pii pair<int, int>
 #define PB push_back
 #define io ios_base::sync_with_stdio(false); cin.tie(NULL); cout.tie(NULL);
 
-vector<string> hash_table[M];
+static bool hash_table[4][M];
+static ll pr[4]={53,2311,13331,123457};
 
-ll hash_value(string s)
+ll choice(char c)
 {
-    ll x, value = 0;
-    int p = 53;
-    for (int i = 0; i < s.size(); i++)
+    if(c>='a'&&c<='z')
     {
-        if ((s[i] - 'a' < 25) && (s[i] - 'a' >= 0))
-            x = s[i] - 'a';
-        else
-            x = s[i] - 'A' + 25;
-
-        value += ((x + 1) * p) % M;
-        p = p * 53;
+        return (ll)(c-'a'+1);
     }
-    return value;
+    else
+        return (ll)(c-'A'+27);
 }
 
-bool search(string s)
+ll func(string &s,ll p)
 {
-    ll val = hash_value(s);
-    for (int i = 0; i < hash_table[val].size(); i++)
+    ll n=s.size();
+    ll r=1;
+    ll ans=0;
+    for(ll i=0;i<n;i++)
     {
-        if (s == hash_table[val][i])
-            return true;
+        ans+=(r*choice(s[i]))%M;
+        ans%=M;
+        r*=p;
+        r%=M;
     }
-    return false;
+    return ans;
 }
 
 int main()
 {
     io
     ll n;
-    cin >> n;
-
-    for (int i = 0; i < n; i++)
+    cin>>n;
+    vector<string> v;
+    while(n--)
     {
-        string temp, temp1;
-        cin >> temp;
-        temp1 = temp;
-        hash_table[hash_value(temp)].push_back(temp);
-
-        reverse(temp.begin(), temp.end());
-        if (temp == temp1)
-            continue;
-        if (search(temp))
+        string s;
+        cin>>s;
+        string t=s;
+        reverse(t.begin(),t.end());
+        if(s!=t)
         {
-            cout << "YES" << endl;
+            v.PB(s);
+            for(int j=0;j<4;j++)
+            {
+                hash_table[j][func(t,pr[j])]=true;
+            }
+        }
+    }
+    for(auto s:v)
+    {
+        bool flag=true;
+        for(int j=0;j<4;j++)
+        {
+            if(hash_table[j][func(s,pr[j])]==false) flag=false;
+        }
+        if(flag==true)
+        {
+            cout<<"YES";
             return 0;
         }
     }
-    cout << "NO" << endl;
+    cout<<"NO";
 
     return 0;
 }
